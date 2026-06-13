@@ -26,7 +26,7 @@ from config import DIRS
 logger = logging.getLogger(__name__)
 
 # 进程数
-MAX_WORKERS = 20
+MAX_WORKERS = 32  # 服务器 15 vCPU，obabel I/O 密集型可超配
 
 # 全局共享计数器（多进程安全）
 _counter = None

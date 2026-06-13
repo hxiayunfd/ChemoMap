@@ -31,7 +31,8 @@ from config import ADGPU_CONFIG, DIRS, TOOLS
 logger = logging.getLogger(__name__)
 
 # 并行 GPU 对接线程数（AutoDock-GPU 支持多任务交叠）
-DOCK_WORKERS = 4
+from config import ADGPU_CONFIG as _ADGPU_CFG
+DOCK_WORKERS = _ADGPU_CFG.get("dock_workers", 8)
 
 
 def parse_best_energy_dlg(dlg_path):

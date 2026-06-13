@@ -204,35 +204,24 @@ CNS_FILTER: Dict[str, Any] = {
 # ============================================================
 ADGPU_CONFIG: Dict[str, Any] = {
     # ── 对接盒参数 ──
-    # 对接盒中心坐标 (Å)
-    "center_x": 0.0,
-    "center_y": 0.0,
-    "center_z": 0.0,
-    # 对接盒网格点数 (每个方向)
-    "size_x": 30,
-    "size_y": 30,
-    "size_z": 30,
-    # 网格间距 (Å)，AutoDock 默认 0.375
+    "center_x": 0.0, "center_y": 0.0, "center_z": 0.0,
+    "size_x": 30, "size_y": 30, "size_z": 30,
     "grid_spacing": 0.375,
 
     # ── 对接参数 ──
-    # 输出的对接构象数量
     "num_poses": 20,
-    # 每个配体的对接运行次数
-    "num_runs": 10,
-    # 种群大小 (GA 参数)
+    # 每个配体的对接运行次数（越大越精确，4090 可用 50）
+    "num_runs": 30,
     "population_size": 200,
-    # 最大评估次数
-    "max_evals": 5_000_000,
-    # 最大代数
-    "max_generations": 50_000,
+    "max_evals": 10_000_000,
+    "max_generations": 100_000,
 
     # ── GPU 配置 ──
-    # GPU 设备编号
     "gpu": 0,
+    # 并行对接线程数（4090 24GB 可跑 8-12 并发）
+    "dock_workers": 8,
 
     # ── 文件 ──
-    # 受体 PDBQT 文件路径（通过命令行设置或交互式选择）
     "receptor": "",
 }
 
