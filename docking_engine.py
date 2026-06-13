@@ -132,17 +132,36 @@ class DockingEngine:
 
     def _check_tools(self):
         missing = []
+        # AutoDock-GPU: 先找二进制，不行就找 conda 环境
+        self._use_conda_adgpu = False
         if not Path(self.adgpu_bin).exists():
-            missing.append("AutoDock-GPU")
+            adgpu_env = self.cm.get_env("autodock_gpu")
+            if adgpu_env and adgpu_env != "base":
+                self._use_conda_adgpu = True
+                self._adgpu_env = adgpu_env
+            else:
+                missing.append("AutoDock-GPU")
+        # autogrid4 / prepare_gpf4 也可能在 adgpu conda 环境里
         if not Path(self.autogrid_bin).exists():
-            missing.append("AutoGrid4")
+            ag_env = self.cm.get_env("autodock_gpu")
+            ag_bin = Path.home() / "miniconda3" / "envs" / ag_env / "bin" / "autogrid4"
+            if ag_bin.exists():
+                self.autogrid_bin = str(ag_bin)
+            else:
+                missing.append("AutoGrid4")
         if not Path(self.prepare_gpf4_bin).exists():
-            missing.append("prepare_gpf4")
+            ag_env = self.cm.get_env("autodock_gpu")
+            gpf_bin = Path.home() / "miniconda3" / "envs" / ag_env / "bin" / "prepare_gpf4"
+            if gpf_bin.exists():
+                self.prepare_gpf4_bin = str(gpf_bin)
+            else:
+                missing.append("prepare_gpf4")
         if missing:
             self._mock_mode = True
             logger.warning(f"Missing: {', '.join(missing)}. Using MOCK mode.")
         else:
-            logger.info("Docking engine ready: AutoDock-GPU + AutoGrid4 + ADTools")
+            mode = f"conda:{self._adgpu_env}" if self._use_conda_adgpu else "direct"
+            logger.info(f"Docking engine ready: AutoDock-GPU ({mode}) + AutoGrid4 + ADTools")
 
     # ============================================================
     # 网格地图
@@ -203,15 +222,18 @@ class DockingEngine:
     # ============================================================
 
     def _dock_one(self, ligand_pdbqt: Path, output_dir: Path, ligand_name: str, timeout=300) -> dict:
-        """运行单个 AutoDock-GPU 对接，返回结果字典"""
-        cmd = [
-            self.adgpu_bin,
+        """运行单个 AutoDock-GPU 对接（自动选择 conda run 或直接调用）"""
+        adgpu_args = [
             "--lfile", str(ligand_pdbqt.resolve()),
             "--ffile", str(self._grid_fld.resolve()),
             "--nrun", str(self.config.get("num_runs", 20)),
             "--resnam", str(output_dir / ligand_name),
             "--gbest", "1",
         ]
+        if self._use_conda_adgpu:
+            cmd = ["conda", "run", "-n", self._adgpu_env, self.adgpu_bin] + adgpu_args
+        else:
+            cmd = [self.adgpu_bin] + adgpu_args
         try:
             r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout, cwd=str(output_dir))
             if r.returncode != 0:
