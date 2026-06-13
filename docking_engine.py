@@ -246,7 +246,10 @@ class DockingEngine:
             if r.returncode != 0:
                 return {"success": False, "binding_energy": None, "error": f"rc={r.returncode}"}
 
+            # AutoDock-GPU 可能把输出写到 fld 所在目录而非 output_dir
             energy = parse_best_energy(output_dir, ligand_name)
+            if energy is None and self._grid_fld:
+                energy = parse_best_energy(self._grid_fld.parent, ligand_name)
             return {"success": True, "binding_energy": energy, "error": None}
         except subprocess.TimeoutExpired:
             return {"success": False, "binding_energy": None, "error": "timeout"}
