@@ -31,3 +31,6 @@ Thumbs.db
 *.xml
 *.zip
 *.tar.gz
+.claude/
+!protein/
+!protein/**
