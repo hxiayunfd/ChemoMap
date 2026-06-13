@@ -234,7 +234,9 @@ class DockingEngine:
             "--lfile", str(ligand_pdbqt.resolve()),
             "--ffile", str(self._grid_fld.resolve()),
             "--nrun", str(self.config.get("num_runs", 20)),
-            "--resnam", str(output_dir / ligand_name),
+            "--resnam", str(output_dir.resolve() / ligand_name),
+            "--xmloutput", "1",
+            "--dlgoutput", "1",
             "--gbest", "1",
         ]
         if self._use_conda_adgpu:
