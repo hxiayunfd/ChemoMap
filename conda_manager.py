@@ -229,25 +229,18 @@ class CondaManager:
     def detect_env_packages(self, env_name: str) -> List[str]:
         """
         检测指定 Conda 环境中安装的 Python 包
-
-        运行 `conda run -n <env> pip list --format=json`
-
-        Args:
-            env_name: Conda 环境名称
-
-        Returns:
-            已安装的 Python 包名称列表（小写）
         """
         try:
+            # conda run 在 base 环境时可能 crash，特殊处理
+            actual_env = env_name if env_name not in ("miniconda3", "anaconda3") else "base"
             result = subprocess.run(
-                [self.conda_bin, "run", "-n", env_name,
+                ["conda", "run", "-n", actual_env,
                  "python", "-c",
                  "import pkg_resources; "
                  "print([p.project_name.lower() for p in pkg_resources.working_set])"],
                 capture_output=True, text=True, timeout=60
             )
             if result.returncode == 0:
-                # 解析 Python 列表输出
                 packages = eval(result.stdout.strip())
                 return packages
         except Exception as e:
@@ -506,21 +499,16 @@ class CondaManager:
     def get_env(self, tool_name: str) -> str:
         """
         获取工具对应的 Conda 环境名称
-
-        Args:
-            tool_name: 工具名称
-
-        Returns:
-            Conda 环境名称
         """
         if tool_name not in self.tool_env_map:
             self.assign_tools()
 
         env = self.tool_env_map.get(tool_name)
         if env is None:
-            # 最终回退
-            logger.warning(f"No conda environment assigned for '{tool_name}', "
-                          f"using 'base'")
+            logger.warning(f"No conda environment assigned for '{tool_name}', using 'base'")
+            return "base"
+        # miniconda3/anaconda3 目录名映射到 base
+        if env in ("miniconda3", "anaconda3"):
             return "base"
         return env
 

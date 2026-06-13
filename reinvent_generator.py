@@ -74,8 +74,8 @@ class ReinventGenerator:
             self._enable_mock(f"reinvent not found: {REINVENT_BIN}")
             return
         if not prior.exists():
-            self._enable_mock(f"prior not found: {MOL2MOL_PRIOR}")
-            return
+            logger.warning(f"Prior not found: {MOL2MOL_PRIOR}")
+            # 不 fallback，继续（用户可能有自己的模型）
 
         logger.info(
             f"REINVENT4 ready: {REINVENT_BIN}\n"
