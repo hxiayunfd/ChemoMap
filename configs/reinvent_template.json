@@ -1,0 +1,29 @@
+{
+  "_comment": "Reinvent4 配置文件模板 — 请根据实际环境修改",
+
+  "run_type": "generate",
+  "num_smiles": 5000,
+  "batch_size": 128,
+  "random_seed": 42,
+  "output_format": "smi",
+  "include_score": true,
+
+  "model": {
+    "_comment": "预训练模型路径",
+    "model_path": "/path/to/your/reinvent4/model.ckpt",
+    "model_type": "transformer"
+  },
+
+  "generation": {
+    "mode": "scaffold_hop",
+    "temperature": 1.0,
+    "top_k": 100,
+    "top_p": 0.95
+  },
+
+  "scaffold_hop": {
+    "num_smiles_per_seed": 100,
+    "similarity_weight": 0.5,
+    "activity_weight": 0.5
+  }
+}

@@ -1,0 +1,33 @@
+# Output
+output/
+logs/*.log
+temp/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Conda / venv
+.env
+.venv
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Large files
+*.map
+*.maps.fld
+*.glg
+*.pdb
+*.pdbqt
+*.sdf
+*.dlg
+*.xml
+*.zip
+*.tar.gz

@@ -1,0 +1,66 @@
+{
+  "_comment": "虚拟筛选管线 — 示例配置文件 (AutoDock-GPU + Reinvent4)",
+
+  "reinvent": {
+    "num_smiles": 5000,
+    "batch_size": 128,
+    "random_seed": 42,
+    "generation_mode": "scaffold_hop",
+    "temperature": 1.0
+  },
+
+  "property_filters": {
+    "molecular_weight": {"min": 150, "max": 500},
+    "logp": {"min": -2.0, "max": 5.0},
+    "hbd": {"max": 5},
+    "hba": {"max": 10},
+    "rotatable_bonds": {"max": 10},
+    "tpsa": {"min": 0, "max": 140},
+    "ring_count": {"max": 6},
+    "remove_pains": true,
+    "remove_brenk": false,
+    "require_lipinski": true
+  },
+
+  "cns_filter": {
+    "enabled": false,
+    "mw_max": 450,
+    "logp_min": 1.0,
+    "logp_max": 4.5,
+    "tpsa_max": 90,
+    "hbd_max": 2,
+    "hba_max": 7
+  },
+
+  "docking": {
+    "receptor": "/path/to/your/receptor.pdbqt",
+    "center_x": 0.0,
+    "center_y": 0.0,
+    "center_z": 0.0,
+    "size_x": 30,
+    "size_y": 30,
+    "size_z": 30,
+    "grid_spacing": 0.375,
+    "num_poses": 20,
+    "num_runs": 10,
+    "gpu": 0
+  },
+
+  "seed_selection": {
+    "num_seeds": 50,
+    "binding_energy_threshold": -7.0,
+    "strategy": "top_n",
+    "cluster_similarity": 0.7,
+    "enable_pains_filter": true,
+    "max_seeds": 200
+  },
+
+  "iteration": {
+    "max_rounds": 10,
+    "convergence_rounds": 3,
+    "convergence_threshold": 0.5,
+    "early_stopping": true,
+    "save_checkpoints": true,
+    "continue_on_failure": false
+  }
+}
