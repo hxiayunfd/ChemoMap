@@ -44,6 +44,7 @@ from config import (
 )
 
 # ── 日志配置 ──
+DIRS["logs"].mkdir(parents=True, exist_ok=True)
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
