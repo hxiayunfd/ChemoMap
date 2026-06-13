@@ -119,8 +119,8 @@ def _find_binary(name: str, fallback: str = "") -> str:
 
 TOOLS: Dict[str, str] = {
     "reinvent4": _find_binary("reinvent", "reinvent"),
-    "autodock_gpu": _find_binary("autodock_gpu_128wi",
-        str(Path.home() / "bio_tools/AutoDock-GPU/bin/autodock_gpu_128wi")),
+    "autodock_gpu": _find_binary("autodock_gpu_256wi") or _find_binary("autodock_gpu_128wi") or
+        str(Path.home() / "AutoDock-GPU/bin/autodock_gpu_256wi"),
     "prepare_ligand4": _find_binary("prepare_ligand4"),
     "prepare_gpf4": _find_binary("prepare_gpf4"),
     "autogrid4": _find_binary("autogrid4", "/usr/bin/autogrid4"),
