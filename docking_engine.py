@@ -107,10 +107,9 @@ class DockingEngine:
         self.config = {**ADGPU_CONFIG, **(config or {})}
 
         # 工具链路径
-        self.adgpu_bin = TOOLS.get("autodock_gpu",
-            str(Path.home() / "bio_tools/AutoDock-GPU/bin/autodock_gpu_128wi"))
-        self.autogrid_bin = TOOLS.get("autogrid4", "/usr/bin/autogrid4")
-        self.prepare_gpf4_bin = str(Path.home() / "miniconda3/bin/prepare_gpf4")
+        self.adgpu_bin = TOOLS.get("autodock_gpu", "autodock_gpu_128wi")
+        self.autogrid_bin = TOOLS.get("autogrid4", "autogrid4")
+        self.prepare_gpf4_bin = TOOLS.get("prepare_gpf4", "prepare_gpf4")
 
         self._mock_mode = False
         self._grid_ready = False

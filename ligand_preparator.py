@@ -51,8 +51,10 @@ def _convert_one(args):
             _counter.value += 1
         return compound_name, True
 
+    import shutil
+    obabel = shutil.which("obabel") or "obabel"
     cmd = [
-        "obabel", "-ismi", "-opdbqt",
+        obabel, "-ismi", "-opdbqt",
         "-O", output_path,
         "--gen3D", "--partialcharge", "gasteiger",
     ]
@@ -88,12 +90,14 @@ class LigandPreparator:
     """配体准备器 — OpenBabel 直接 SMILES → PDBQT"""
 
     def __init__(self, conda_manager=None):
+        from config import TOOLS as _cfg_tools
+        self._obabel_bin = _cfg_tools.get("obabel", "obabel")
         self._has_obabel = True
         try:
-            subprocess.run(["obabel", "-V"], capture_output=True, timeout=5)
+            subprocess.run([self._obabel_bin, "-V"], capture_output=True, timeout=5)
         except Exception:
             self._has_obabel = False
-            logger.warning("OpenBabel not found!")
+            logger.warning(f"OpenBabel not found at '{self._obabel_bin}'!")
 
     def batch_convert_to_pdbqt(
         self,

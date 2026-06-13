@@ -86,24 +86,57 @@ CONDA_ENVS = {
 
 
 # ============================================================
-# 外部工具路径配置
+# 外部工具自动发现
 # ============================================================
+
+def _find_binary(name: str, fallback: str = "") -> str:
+    """在 PATH 和 conda 环境中查找可执行文件"""
+    import shutil as _sh
+    # 1. 环境变量
+    env_key = name.upper() + "_BIN"
+    if os.environ.get(env_key):
+        return os.environ[env_key]
+    # 2. 直接 which
+    found = _sh.which(name)
+    if found:
+        return found
+    # 3. 常见安装位置
+    for base in [Path.home() / "miniconda3", Path.home() / "anaconda3",
+                  Path("/opt/conda"), Path("/usr/local")]:
+        for sub in ["bin", "envs"]:
+            p = base / sub / name
+            if p.exists():
+                return str(p)
+    # 4. 搜索所有 conda 环境
+    for env_dir in [Path.home() / "miniconda3" / "envs",
+                     Path.home() / "anaconda3" / "envs"]:
+        if env_dir.exists():
+            for env_path in env_dir.iterdir():
+                p = env_path / "bin" / name
+                if p.exists():
+                    return str(p)
+    return fallback or name
+
 TOOLS: Dict[str, str] = {
-    # Reinvent4 可执行文件
-    "reinvent4": os.environ.get("REINVENT4_BIN", "reinvent"),
-    # AutoDock-GPU 可执行文件（编译安装路径）
-    "autodock_gpu": os.environ.get(
-        "ADGPU_BIN",
-        str(Path.home() / "bio_tools" / "AutoDock-GPU" / "bin" / "autodock_gpu_128wi"),
-    ),
-    # prepare_receptor4 (ADTools) 可执行文件 — 蛋白 PDB → PDBQT
-    "prepare_receptor4": os.environ.get(
-        "PREPARE_RECEPTOR4_BIN",
-        str(Path.home() / "miniconda3" / "bin" / "prepare_receptor4"),
-    ),
-    # AutoGrid4 可执行文件（用于生成 GPF/GLG 网格文件）
-    "autogrid4": os.environ.get("AUTOGRID4_BIN", "/usr/bin/autogrid4"),
+    "reinvent4": _find_binary("reinvent", "reinvent"),
+    "autodock_gpu": _find_binary("autodock_gpu_128wi",
+        str(Path.home() / "bio_tools/AutoDock-GPU/bin/autodock_gpu_128wi")),
+    "prepare_ligand4": _find_binary("prepare_ligand4"),
+    "prepare_gpf4": _find_binary("prepare_gpf4"),
+    "autogrid4": _find_binary("autogrid4", "/usr/bin/autogrid4"),
+    "obabel": _find_binary("obabel", "obabel"),
 }
+
+# Reinvent4 Mol2Mol prior 模型
+MOL2MOL_PRIOR_PATH = os.environ.get(
+    "MOL2MOL_PRIOR",
+    str(Path.home() / "REINVENT4-main/prior/mol2mol_medium_similarity.prior"),
+)
+if not Path(MOL2MOL_PRIOR_PATH).exists():
+    # 搜索
+    for p in Path.home().rglob("mol2mol_medium_similarity.prior"):
+        MOL2MOL_PRIOR_PATH = str(p)
+        break
 
 
 # ============================================================

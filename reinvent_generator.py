@@ -40,9 +40,10 @@ logger = logging.getLogger(__name__)
 
 
 # ── REINVENT4 工具路径 ──
-REINVENT_BIN = "/home/xiayun-huang/miniconda3/envs/reinvent4/bin/reinvent"
-# Mol2Mol 预训练模型
-MOL2MOL_PRIOR = "/home/xiayun-huang/REINVENT4-main/prior/mol2mol_medium_similarity.prior"
+from config import TOOLS as _CFG_TOOLS, MOL2MOL_PRIOR_PATH
+
+REINVENT_BIN = _CFG_TOOLS.get("reinvent4", "reinvent")
+MOL2MOL_PRIOR = MOL2MOL_PRIOR_PATH
 
 
 class ReinventGenerator:

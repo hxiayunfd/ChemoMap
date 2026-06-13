@@ -1,0 +1,33 @@
+# REINVENT4 TOML input for ChemoMap mol2mol sampling
+run_type = "sampling"
+device = "cuda:0"
+json_out_config = "_sampling.json"
+
+[parameters]
+# 指定 mol2mol 的预训练模型（请确保该路径真实存在）
+model_file = "/home/xiayun-huang/ChemoMap/prior/mol2mol_medium_similarity.prior"
+
+# 种子分子文件（因为 Python 脚本运行时会切换工作目录，这里直接用相对路径即可）
+smiles_file = "seed.smi"
+
+# mol2mol 专属采样策略：束搜索
+sample_strategy = "multimodal"
+temperature = 0.8
+
+# 输出结果文件名
+output_file = 'library.csv'
+
+# 采样数量（Python 脚本会自动将这里的 200 替换为你设定的数值）
+num_smiles = 200
+
+# 分子去重与随机化
+unique_molecules = true
+randomize_smiles = false
+
+# mol2mol 专属相似性约束参数
+# Python 脚本会自动将这里的 PLACEHOLDER_SMILES 替换为 seed.smi 里的真实分子
+[sampling.parameters]
+reference_smiles = "PLACEHOLDER_SMILES"
+similarity_type = "Tanimoto"
+lower = 0.6
+upper = 0.9
