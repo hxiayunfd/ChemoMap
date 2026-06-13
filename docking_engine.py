@@ -179,11 +179,17 @@ class DockingEngine:
         output_dir.mkdir(parents=True, exist_ok=True)
         fld_path = receptor_dir / f"{pdb_id}.maps.fld"
 
-        if fld_path.exists() and not force:
-            logger.info(f"Grid maps exist: {fld_path}")
-            self._grid_fld = fld_path
-            self._grid_ready = True
-            return fld_path
+        # 检查 GPF 中的受体路径是否有效（防止从其他机器拷贝的网格）
+        gpf_path = receptor_dir / f"{pdb_id}.gpf"
+        if fld_path.exists() and not force and gpf_path.exists():
+            gpf_text = gpf_path.read_text()
+            if str(self.receptor.resolve()) in gpf_text or str(self.receptor.name) in gpf_text:
+                logger.info(f"Grid maps exist: {fld_path}")
+                self._grid_fld = fld_path
+                self._grid_ready = True
+                return fld_path
+            else:
+                logger.info(f"Grid maps have stale paths, regenerating...")
 
         cx, cy, cz = self.config["center_x"], self.config["center_y"], self.config["center_z"]
         nx, ny, nz = self.config.get("size_x", 40), self.config.get("size_y", 40), self.config.get("size_z", 40)
